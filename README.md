@@ -1,5 +1,4 @@
 # API Hook for Windows
-***
 ## About
 * install_hook.exe
 console app to intall hook dll to a target process.
