@@ -91,6 +91,10 @@ void ReplaceIATEntryInAModule(PCSTR pszModuleName, PROC pfnCurrent, PROC pfnNew,
       VirtualProtect(ppfn, sizeof(ppfn), PAGE_EXECUTE_READWRITE, &dwDummy);
       WriteProcessMemory(GetCurrentProcess(), ppfn, &pfnNew, sizeof(pfnNew),
                          NULL);
+      char szMessage[1024];
+      sprintf_s(szMessage, "* IAT entry at 0x%p changed from 0x%p to 0x%p\n",
+                ppfn, pfnCurrent, pfnNew);
+      ::OutputDebugStringA(szMessage);
       return;
     }
     pThunk++;
@@ -110,6 +114,9 @@ void ReplaceIATEntryInAllModules(PCSTR pszModuleName, PROC pfnCurrent,
   me.dwSize = sizeof(me);
   BOOL bModuleResult = Module32First(hModuleSnap, &me);
   while (bModuleResult) {
+    TCHAR szMessage[1024];
+    _stprintf_s(szMessage, _T("* Checking module %s, %s\n"), me.szModule, me.szExePath);
+	::OutputDebugString(szMessage);
     ReplaceIATEntryInAModule(pszModuleName, pfnCurrent, pfnNew, me.hModule);
     bModuleResult = Module32Next(hModuleSnap, &me);
   }
